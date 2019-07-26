@@ -34,8 +34,6 @@ void Delay_ms(uint32_t ms)
   }
 }
 
-//tEST
-
 /**
   * @brief  Main program
   * @param  None
