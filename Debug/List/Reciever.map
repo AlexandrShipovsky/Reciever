@@ -1,0 +1,280 @@
+###############################################################################
+#
+# IAR ELF Linker V8.30.1.114/W32 for ARM                  26/Jul/2019  10:35:27
+# Copyright 2007-2018 IAR Systems AB.
+#
+#    Output file  =  
+#        C:\Users\user\Documents\IAR Project\Reciever\Debug\Exe\Reciever.out
+#    Map file     =  
+#        C:\Users\user\Documents\IAR Project\Reciever\Debug\List\Reciever.map
+#    Command line =  
+#        -f C:\Users\user\AppData\Local\Temp\EWA279.tmp
+#        ("C:\Users\user\Documents\IAR Project\Reciever\Debug\Obj\main.o"
+#        "C:\Users\user\Documents\IAR Project\Reciever\Debug\Obj\misc.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\startup_stm32f10x_md.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_adc.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_bkp.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_can.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_cec.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_crc.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_dac.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_dbgmcu.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_dma.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_exti.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_flash.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_fsmc.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_gpio.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_i2c.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_it.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_iwdg.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_pwr.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_rcc.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_rtc.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_sdio.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_spi.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_tim.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_usart.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\stm32f10x_wwdg.o"
+#        "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\Obj\system_stm32f10x.o" --no_out_extension -o
+#        "C:\Users\user\Documents\IAR Project\Reciever\Debug\Exe\Reciever.out"
+#        --redirect _Printf=_PrintfFullNoMb --redirect _Scanf=_ScanfFullNoMb
+#        --map "C:\Users\user\Documents\IAR
+#        Project\Reciever\Debug\List\Reciever.map" --config "C:\Program Files
+#        (x86)\IAR Systems\Embedded Workbench
+#        8.1\arm\config\linker\ST\stm32f103x8.icf" --semihosting --entry
+#        __iar_program_start --vfe --text_out locale)
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor       = *
+__SystemLibrary = DLib
+__dlib_version  = 6
+
+
+*******************************************************************************
+*** HEAP SELECTION
+***
+
+The basic heap was selected because no calls to memory allocation
+functions were found in the application outside of system library
+functions, and there are calls to deallocation functions in the
+application.
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A0":  place at 0x800'0000 { ro section .intvec };
+"P1":  place in [from 0x800'0000 to 0x800'ffff] { ro };
+define block CSTACK with size = 2K, alignment = 8 { };
+define block HEAP with size = 2K, alignment = 8 { };
+"P2":  place in [from 0x2000'0000 to 0x2000'4fff] {
+          rw, block CSTACK, block HEAP };
+
+No sections matched the following patterns:
+
+  rw  in "P2"
+
+
+  Section   Kind         Address   Size  Object
+  -------   ----         -------   ----  ------
+"A0":                              0xec
+  .intvec   ro code   0x800'0000   0xec  startup_stm32f10x_md.o [1]
+                    - 0x800'00ec   0xec
+
+"P1":                             0x384
+  .text     ro code   0x800'00ec  0x118  system_stm32f10x.o [1]
+  .text     ro code   0x800'0204   0xcc  stm32f10x_gpio.o [1]
+  .text     ro code   0x800'02d0   0x60  main.o [1]
+  .text     ro code   0x800'0330   0x20  stm32f10x_rcc.o [1]
+  .text     ro code   0x800'0350   0x1e  cmain.o [3]
+  .text     ro code   0x800'036e    0x4  low_level_init.o [2]
+  .text     ro code   0x800'0372    0x4  exit.o [2]
+  .text     ro code   0x800'0376   0x12  stm32f10x_it.o [1]
+  .text     ro code   0x800'0388    0xa  cexit.o [3]
+  .text     ro code   0x800'0394   0x14  exit.o [4]
+  .text     ro code   0x800'03a8   0x10  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03b8    0xc  cstartup_M.o [3]
+  .text     ro code   0x800'03c4    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03c8    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03cc    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03d0    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03d4    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03d8    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03dc    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03e0    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03e4    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03e8    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03ec    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03f0    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03f4    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03f8    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'03fc    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0400    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0404    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0408    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'040c    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0410    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0414    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0418    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'041c    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0420    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0424    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0428    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'042c    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0430    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0434    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0438    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'043c    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0440    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0444    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0448    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'044c    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0450    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0454    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0458    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'045c    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0460    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0464    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'0468    0x4  startup_stm32f10x_md.o [1]
+  .text     ro code   0x800'046c    0x4  startup_stm32f10x_md.o [1]
+                    - 0x800'0470  0x384
+
+"P2":                             0x800
+  CSTACK             0x2000'0000  0x800  <Block>
+    CSTACK  uninit   0x2000'0000  0x800  <Block tail>
+                   - 0x2000'0800  0x800
+
+Unused ranges:
+
+         From           To    Size
+         ----           --    ----
+   0x800'0470   0x800'ffff  0xfb90
+  0x2000'0800  0x2000'4fff  0x4800
+
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                  ro code  rw data
+    ------                  -------  -------
+command line/config:
+    ----------------------------------------
+    Total:
+
+C:\Users\user\Documents\IAR Project\Reciever\Debug\Obj: [1]
+    main.o                       96
+    startup_stm32f10x_md.o      424
+    stm32f10x_gpio.o            204
+    stm32f10x_it.o               18
+    stm32f10x_rcc.o              32
+    system_stm32f10x.o          280
+    ----------------------------------------
+    Total:                    1 054
+
+dl7M_tln.a: [2]
+    exit.o                        4
+    low_level_init.o              4
+    ----------------------------------------
+    Total:                        8
+
+rt7M_tl.a: [3]
+    cexit.o                      10
+    cmain.o                      30
+    cstartup_M.o                 12
+    ----------------------------------------
+    Total:                       52
+
+shb_l.a: [4]
+    exit.o                       20
+    ----------------------------------------
+    Total:                       20
+
+    Gaps                          2
+    Linker created                     2 048
+--------------------------------------------
+    Grand Total:              1 136    2 048
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                       Address  Size  Type      Object
+-----                       -------  ----  ----      ------
+?main                    0x800'0351        Code  Gb  cmain.o [3]
+BusFault_Handler         0x800'037d   0x2  Code  Gb  stm32f10x_it.o [1]
+CSTACK$$Base            0x2000'0000         --   Gb  - Linker created -
+CSTACK$$Limit           0x2000'0800         --   Gb  - Linker created -
+DebugMon_Handler         0x800'0383   0x2  Code  Gb  stm32f10x_it.o [1]
+Delay_ms                 0x800'02d1   0xc  Code  Gb  main.o [1]
+GPIO_Init                0x800'0205  0xc0  Code  Gb  stm32f10x_gpio.o [1]
+GPIO_ResetBits           0x800'02cb   0x6  Code  Gb  stm32f10x_gpio.o [1]
+GPIO_SetBits             0x800'02c5   0x6  Code  Gb  stm32f10x_gpio.o [1]
+HardFault_Handler        0x800'0379   0x2  Code  Gb  stm32f10x_it.o [1]
+MemManage_Handler        0x800'037b   0x2  Code  Gb  stm32f10x_it.o [1]
+NMI_Handler              0x800'0377   0x2  Code  Gb  stm32f10x_it.o [1]
+PendSV_Handler           0x800'0385   0x2  Code  Gb  stm32f10x_it.o [1]
+RCC_APB2PeriphClockCmd   0x800'0331  0x1c  Code  Gb  stm32f10x_rcc.o [1]
+Region$$Table$$Base             0x0         --   Gb  - Linker created -
+Region$$Table$$Limit            0x0         --   Gb  - Linker created -
+SVC_Handler              0x800'0381   0x2  Code  Gb  stm32f10x_it.o [1]
+SetSysClock              0x800'0131   0x8  Code  Lc  system_stm32f10x.o [1]
+SetSysClockTo72          0x800'0139  0xae  Code  Lc  system_stm32f10x.o [1]
+SysTick_Handler          0x800'0387   0x2  Code  Gb  stm32f10x_it.o [1]
+SystemInit               0x800'00ed  0x44  Code  Gb  system_stm32f10x.o [1]
+UsageFault_Handler       0x800'037f   0x2  Code  Gb  stm32f10x_it.o [1]
+__cmain                  0x800'0351        Code  Gb  cmain.o [3]
+__exit                   0x800'0395  0x14  Code  Gb  exit.o [4]
+__iar_program_start      0x800'03b9        Code  Gb  cstartup_M.o [3]
+__low_level_init         0x800'036f   0x4  Code  Gb  low_level_init.o [2]
+__vector_table           0x800'0000        Data  Gb  startup_stm32f10x_md.o [1]
+_call_main               0x800'035d        Code  Gb  cmain.o [3]
+_exit                    0x800'0389        Code  Gb  cexit.o [3]
+_main                    0x800'036b        Code  Gb  cmain.o [3]
+exit                     0x800'0373   0x4  Code  Gb  exit.o [2]
+main                     0x800'02dd  0x4c  Code  Gb  main.o [1]
+
+
+[1] = C:\Users\user\Documents\IAR Project\Reciever\Debug\Obj
+[2] = dl7M_tln.a
+[3] = rt7M_tl.a
+[4] = shb_l.a
+
+  1 136 bytes of readonly  code memory
+  2 048 bytes of readwrite data memory
+
+Errors: none
+Warnings: none
