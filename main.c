@@ -30,12 +30,15 @@
 #define Relay_4 GPIO_Pin_3
 #define Relay_5 GPIO_Pin_4
 #define Relay_6 GPIO_Pin_5
+// Пин LED
+#define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 char buf[32]; // Кольцевой буфер
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
 /* Private functions ---------------------------------------------------------*/
+// Программная задержка
 void Delay_ms(uint32_t ms)
 {
   for (uint32_t i = 0; i < ms; i++)
@@ -57,7 +60,7 @@ int main(void)
   // Настройка GPIO
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
   GPIO_InitTypeDef PIN_INIT;
-  PIN_INIT.GPIO_Pin = GPIO_Pin_13;
+  PIN_INIT.GPIO_Pin = LEDpin;
   PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
   PIN_INIT.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_Init(GPIOC, &PIN_INIT);
@@ -65,7 +68,7 @@ int main(void)
   // Настройка DMA
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
-  DMA_DeInit(DMA1_Channel5);                                           // Сброс настроек DMA
+  DMA_DeInit(DMA1_Channel5); // Сброс настроек DMA
   DMA_InitTypeDef DMA_InitStruct;
   DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);   // Адрес данных UART
   DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)&buf[0];               // Адрес буфера памяти
@@ -80,7 +83,7 @@ int main(void)
   DMA_InitStruct.DMA_M2M = DMA_M2M_Disable;                            // Отключить режим "из памяти в память"
   DMA_Init(DMA1_Channel5, &DMA_InitStruct);
 
-  DMA_Cmd(DMA1_Channel5, ENABLE);                                      // Включить DMA канал 5
+  DMA_Cmd(DMA1_Channel5, ENABLE); // Включить DMA канал 5
 
   // Настройки UART
 
