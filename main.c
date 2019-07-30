@@ -15,7 +15,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
 #include "stm32f10x_gpio.h"
-#include "stm32f10x_usart.h"
+#include "UART/UART.h"
 #include "stm32f10x_dma.h"
 #include "stm32f10x_crc.h"
 #include <stdio.h>
@@ -34,9 +34,10 @@
 #define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-char buf[32]; // Кольцевой буфер
+char buf[4]; // Кольцевой буфер
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
+void DMA_Ini(void);
 /* Private functions ---------------------------------------------------------*/
 // Программная задержка
 void Delay_ms(uint32_t ms)
@@ -45,34 +46,16 @@ void Delay_ms(uint32_t ms)
   {
   }
 }
-
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-int main(void)
+// Настройка DMA
+void DMA_ini(void)
 {
-
-  /*!< At this stage the microcontroller setting
-     */
-
-  // Настройка GPIO
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-  GPIO_InitTypeDef PIN_INIT;
-  PIN_INIT.GPIO_Pin = LEDpin;
-  PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
-  PIN_INIT.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(GPIOC, &PIN_INIT);
-
-  // Настройка DMA
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
   DMA_DeInit(DMA1_Channel5); // Сброс настроек DMA
   DMA_InitTypeDef DMA_InitStruct;
   DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);   // Адрес данных UART
   DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)&buf[0];               // Адрес буфера памяти
-  DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralDST;                      // Направление передачи от переферии в память
+  DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralSRC;                      // Направление передачи от переферии в память
   DMA_InitStruct.DMA_BufferSize = sizeof(buf);                         // Размер буфера
   DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;        // Отключить инкремент адреса данных переферии
   DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;                 // Включить инкремент адреса памяти
@@ -84,17 +67,50 @@ int main(void)
   DMA_Init(DMA1_Channel5, &DMA_InitStruct);
 
   DMA_Cmd(DMA1_Channel5, ENABLE); // Включить DMA канал 5
+}
+/**
+  * @brief  Main program
+  * @param  None
+  * @retval None
+  */
+int main(void)
+{
 
-  // Настройки UART
+  UART_Init();
+  DMA_ini();
+  /*!< At this stage the microcontroller setting
+     */
 
+  // Настройка LED
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+  GPIO_InitTypeDef PIN_INIT;
+  PIN_INIT.GPIO_Pin = LEDpin;
+  PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
+  PIN_INIT.GPIO_Mode = GPIO_Mode_Out_OD;
+  GPIO_Init(GPIOC, &PIN_INIT);
+
+  //Send_UART_Str(USART1, "I'm ready!\n\r");
+  uint8_t i = 0;
   while (1)
   {
-    GPIO_SetBits(GPIOC, GPIO_Pin_13);
-    Delay_ms(1000000);
-    GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-    Delay_ms(1000000);
-  }
-}
+
+    if (buf[i] == 'w')
+    {
+      GPIO_SetBits(GPIOC, LEDpin);
+      buf[i] = '\0';
+    }
+    else if (buf[i] == 's')
+    {
+      GPIO_ResetBits(GPIOC, LEDpin);
+      buf[i] = '\0';
+    }
+    i++;
+    if (i == sizeof(buf))
+    {
+      i = 0;
+    }
+  } // END_WHILE
+} // END_MAIN
 
 #ifdef USE_FULL_ASSERT
 
