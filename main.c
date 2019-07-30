@@ -20,6 +20,7 @@
 #include "stm32f10x_dma.h"
 #include "stm32f10x_crc.h"
 #include <stdio.h>
+#include "protV/protV.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -35,7 +36,8 @@
 #define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-char buf[4]; // Кольцевой буфер
+uint8_t buf[32]; // Кольцевой буфер
+protVstructure prot;
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
 void DMA_ini(void);
@@ -117,6 +119,8 @@ int main(void)
   RCCStatus = RCC_ini();
   UART_Init();
   DMA_ini();
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
+
   /*!< At this stage the microcontroller setting
      */
 
@@ -127,27 +131,39 @@ int main(void)
   PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
   PIN_INIT.GPIO_Mode = GPIO_Mode_Out_OD;
   GPIO_Init(GPIOC, &PIN_INIT);
-  if (RCCStatus)  // Проверка настроек тактирования
+  if (RCCStatus) // Проверка настроек тактирования
   {
     Send_UART_Str(USART1, "I'm ready!\n\rRCC SUCCESS\n\r");
-  }else
+  }
+  else
   {
     Send_UART_Str(USART1, "I'm ready!\n\rRCC ERROR\n\r");
   }
-  
+
   uint8_t i = 0;
   while (1)
   {
+    uint32_t data, crc;
+    data = 0xFFF1F;
+    CRC_ResetDR();
+    CRC_CalcCRC(data);
+    crc = CRC_GetCRC();
+    data += crc;
 
-    if (buf[i] == 'w')
+    if(FlagStartByte(&buf[i]))
+    {
+      buf[i] = '\0';
+      i++;
+      pars(&prot,&buf[i]);
+    }
+
+    if (prot.fst == 'w')
     {
       GPIO_SetBits(GPIOC, LEDpin);
-      buf[i] = '\0';
     }
-    else if (buf[i] == 's')
+    else if (prot.snd == 's')
     {
-      GPIO_ResetBits(GPIOC, LEDpin);
-      buf[i] = '\0';
+      GPIO_ResetBits(GPIOC, LEDpin); 
     }
     i++;
     if (i == sizeof(buf))

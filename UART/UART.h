@@ -11,6 +11,6 @@
 #define baudrate 9600
 
 void UART_Init(void);
-void Send_UART_Str(USART_TypeDef *USARTx, char *string);
+void Send_UART_Str(USART_TypeDef *USARTx, uint8_t *string);
 
 #endif //_UART.H

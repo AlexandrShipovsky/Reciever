@@ -45,9 +45,10 @@ void UART_Init(void)
 
 	/* Enable USART1 */
 	USART_Cmd(USART1, ENABLE);
-	USART_DMACmd(USART1,USART_DMAReq_Rx,ENABLE);
+	USART_DMACmd(USART1, USART_DMAReq_Rx, ENABLE);
 
-	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
+		{};
 }
 /********************************************************************/
 /********************************************************************/
@@ -55,14 +56,16 @@ void UART_Init(void)
 /********************************************************************/
 /********************************************************************/
 /*  */
-void Send_UART_Str(USART_TypeDef *USARTx, char *string)
+void Send_UART_Str(USART_TypeDef *USARTx, uint8_t *string)
 {
-	uint8_t i = 0;
-            while ((USART1->SR & USART_SR_TXE) == 0);
-	while (string[i])
+	while ((USART1->SR & USART_SR_TXE) == 0)
+		{};
+	while (*string)
 	{
-		USART_SendData(USARTx, string[i]);
-		while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-		i++;
+		USART_SendData(USARTx, *string);
+		string++;
+		while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
+			{};
+
 	} //while
 } //send_Uart_str
