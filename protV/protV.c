@@ -28,14 +28,14 @@
   */
 void pars(protVstructure *prot, uint8_t *str)
 {
- // WordToByte word;
+  WordToByte word;
   prot->fst = *str;
   str++;
   prot->snd = *str;
   str++;
   prot->trd = *str;
   str++;
- /*  word.byte[0] = *str;
+  word.byte[0] = *str;
   str++;
   word.byte[1] = *str;
   str++;
@@ -43,7 +43,6 @@ void pars(protVstructure *prot, uint8_t *str)
   str++;
   word.byte[3] = *str;
   prot->crc = word.word;
-  */
 }
 
 /** 

@@ -36,7 +36,7 @@
 #define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t buf[32]; // Кольцевой буфер
+uint8_t buf[8]; // Кольцевой буфер
 protVstructure prot;
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
@@ -143,18 +143,17 @@ int main(void)
   uint8_t i = 0;
   while (1)
   {
-    uint32_t data, crc;
+    /* uint32_t data, crc;
     data = 0xFFF1F;
     CRC_ResetDR();
     CRC_CalcCRC(data);
     crc = CRC_GetCRC();
-    data += crc;
+    data += crc;*/
 
-    if(FlagStartByte(&buf[i]))
+    if (FlagStartByte(&buf[i]))
     {
-      buf[i] = '\0';
       i++;
-      pars(&prot,&buf[i]);
+      pars(&prot, &buf[i]);
     }
 
     if (prot.fst == 'w')
@@ -163,7 +162,7 @@ int main(void)
     }
     else if (prot.snd == 's')
     {
-      GPIO_ResetBits(GPIOC, LEDpin); 
+      GPIO_ResetBits(GPIOC, LEDpin);
     }
     i++;
     if (i == sizeof(buf))
