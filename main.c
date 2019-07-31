@@ -21,6 +21,7 @@
 #include "stm32f10x_crc.h"
 #include <stdio.h>
 #include "protV/protV.h"
+#include "rdso/rdso.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -36,7 +37,7 @@
 #define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t buf[8]; // Кольцевой буфер
+char buf[12]; // Кольцевой буфер
 protVstructure prot;
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
@@ -143,6 +144,22 @@ int main(void)
   uint8_t i = 0;
   while (1)
   {
+    for (int i = 0; i < 8; i++)
+    {
+      buf[i] = i; // заполнили 235 информационных байтов
+    }
+    int NEr = 2;     // максимальное количесто ошибок
+    c_form(NEr, 12); // будем исправлять 10 ошибок, в буфере длиной 255 байт
+                     // 235 информационых и 20 контрольных
+    c_code(buf);     // Тепрь buf длиной 255 содержит 20 кодовых байт+235 информационных
+
+    buf[5] = 0xFF;
+    buf[6] = 0xAA;
+    buf[7] = 0xFF;
+
+    int8_t nErr = c_decode(buf); // Теперь buf длиной 255 содержит 235 байт исходной информации
+    nErr++;
+    /* 
     uint32_t crc;
     WordToByte word;
 
@@ -176,6 +193,7 @@ int main(void)
     {
       i = 0;
     }
+    */
   } // END_WHILE
 } // END_MAIN
 
