@@ -143,12 +143,8 @@ int main(void)
   uint8_t i = 0;
   while (1)
   {
-    /* uint32_t data, crc;
-    data = 0xFFF1F;
-    CRC_ResetDR();
-    CRC_CalcCRC(data);
-    crc = CRC_GetCRC();
-    data += crc;*/
+    uint32_t crc;
+    WordToByte word;
 
     if (FlagStartByte(&buf[i]))
     {
@@ -156,11 +152,22 @@ int main(void)
       pars(&prot, &buf[i]);
     }
 
-    if (prot.fst == 'w')
+    // Объединяем 4 байта протокола в uint32_t для расчета CRC
+    word.byte[3] = StartByte;
+    word.byte[2] = prot.fst;
+    word.byte[1] = prot.snd;
+    word.byte[0] = prot.trd;
+    // Считаем аппаратно CRC
+    CRC_ResetDR();
+    CRC_CalcCRC(word.word);
+    crc = CRC_GetCRC();
+    crc++;
+
+    if (prot.fst == 0x77)
     {
       GPIO_SetBits(GPIOC, LEDpin);
     }
-    else if (prot.snd == 's')
+    else if (prot.snd == 0x73)
     {
       GPIO_ResetBits(GPIOC, LEDpin);
     }

@@ -40,7 +40,7 @@ typedef struct
  
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
-#define StartByte ((uint8_t)0x63)
+#define StartByte ((uint8_t)0xAA)
 
 /* Exported functions ------------------------------------------------------- */
 /** 

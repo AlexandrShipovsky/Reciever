@@ -35,13 +35,13 @@ void pars(protVstructure *prot, uint8_t *str)
   str++;
   prot->trd = *str;
   str++;
-  word.byte[0] = *str;
-  str++;
-  word.byte[1] = *str;
+  word.byte[3] = *str;
   str++;
   word.byte[2] = *str;
   str++;
-  word.byte[3] = *str;
+  word.byte[1] = *str;
+  str++;
+  word.byte[0] = *str;
   prot->crc = word.word;
 }
 
