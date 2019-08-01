@@ -18,7 +18,7 @@ int c_form ( int NErr, int bufsize );
 
 // The buffer must be a size of bufsize. The first (bufsize-2*NErr) a information for coding.
 // After coding, the first 2*NErr bytes are control, the latter is the source information.
-void c_code  ( char *buf );
+void c_code  ( uint8_t *buf );
 
 // Decode buf of size (bufsize),  receive TextBuf if size (bufsize-2*NErr)
-int c_decode( char *buf );
+int c_decode( uint8_t *buf );

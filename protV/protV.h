@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
+#include "rdso/rdso.h"
 /* Exported types ------------------------------------------------------------*/
 /** 
   *   Cтруктура протокола 
@@ -32,25 +33,30 @@ typedef struct
 /** 
   *   Объединение типов uint32_t и 4 байта
   */
- typedef union
- {
-   uint32_t word;
-   uint8_t byte[4];
- } WordToByte;
- 
+typedef union {
+  uint32_t word;
+  uint8_t byte[4];
+} WordToByte;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
-#define StartByte ((uint8_t)0xAA)
+#define StartByte ((uint8_t)0xAA) // Значение стартового байта
+#define ProtLength ((uint8_t)12)      // Длинна всех данных в пакете
+#define NumbOfErr ((int)2)        // Количество исправляемых ошибок
 
 /* Exported functions ------------------------------------------------------- */
 /** 
-  *   Парсер строки байт в элементы протокола
+  * Парсер пакета ( с кодировкой Рида-Соломона исправляющий 2 ошибки(можно изменить))
+  * Возвращает количество исправленных ошибок
+  * Возвращает -1 Если не удалось исправить все ошибки
   */
-void pars(protVstructure *prot, uint8_t *str);
+int pars(protVstructure *prot, uint8_t *str);
+
 /** 
   *   Флаг стартового байта (StartByte)
   */
 _Bool FlagStartByte(uint8_t *str);
+
 /**
   * @}
   */

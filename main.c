@@ -21,7 +21,6 @@
 #include "stm32f10x_crc.h"
 #include <stdio.h>
 #include "protV/protV.h"
-#include "rdso/rdso.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -37,8 +36,13 @@
 #define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-char buf[12]; // Кольцевой буфер
-protVstructure prot;
+uint8_t buf[15];      // Кольцевой буфер
+protVstructure prot;  // Структура протокола
+int NerrPkg = 0; // Количество битых пакетов
+int TruePkg = 0; // Количество принятых правильных пакетов
+int Nbyte = 0;   // Количество исправленных байт
+
+uint8_t bufON[12];
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
 void DMA_ini(void);
@@ -134,51 +138,84 @@ int main(void)
   GPIO_Init(GPIOC, &PIN_INIT);
   if (RCCStatus) // Проверка настроек тактирования
   {
-    Send_UART_Str(USART1, "I'm ready!\n\rRCC SUCCESS\n\r");
+    //Send_UART_Str(USART1, "I'm ready!\n\rRCC SUCCESS\n\r");
+    printf("I'm ready!\n\rRCC SUCCESS\n\r");
   }
   else
   {
-    Send_UART_Str(USART1, "I'm ready!\n\rRCC ERROR\n\r");
+    //Send_UART_Str(USART1, "I'm ready!\n\rRCC ERROR\n\r");
+    printf("I'm ready!\n\rRCC ERROR\n\r");
   }
 
-  uint8_t i = 0;
+  int i, j = 0;
+  uint32_t crc;    // Переменная для хранения CRC
+  WordToByte word; // Объединение для расчета CRC
+  int nErr;        // Количество исправленных ошибок
+  uint8_t pkg[12]; // Пакет для обработки
   while (1)
   {
-    for (int i = 0; i < 8; i++)
+    
+  /*  bufON[0] = 0xAA;
+    bufON[1] = 0x63;
+    bufON[2] = 0x73;
+    bufON[3] = 0x63;
+    bufON[4] = 0x23;
+    bufON[5] = 0x15;
+    bufON[6] = 0x2C;
+    bufON[7] = 0x09;
+    c_form(NumbOfErr, ProtLength-1); // Будем исправлять 2 ошибки, в буфере длиной ProtLength - 1 байт (за вычетом стартового)
+    c_code(&bufON[1]);     // Тепрь buf длиной 12 содержит 4 кодовых байт+8 информационных
+*/
+    if (FlagStartByte(&buf[i])) // Если в колцевом буфере есть стартовый байт
     {
-      buf[i] = i; // заполнили 235 информационных байтов
-    }
-    int NEr = 2;     // максимальное количесто ошибок
-    c_form(NEr, 12); // будем исправлять 10 ошибок, в буфере длиной 255 байт
-                     // 235 информационых и 20 контрольных
-    c_code(buf);     // Тепрь buf длиной 255 содержит 20 кодовых байт+235 информационных
+      Delay_ms(500000);
+      for (j = 0; j < ProtLength; j++) // Копируем часть строки кольцевого буфера
+      {
+        pkg[j] = buf[i];
+        i++;
+        if (i >= sizeof(buf))
+        {
+          i = 0; // Обнуляем инкремент кольцевого буфера
+        }
+      }
+      j--;
+      i--;
+      nErr = pars(&prot, pkg); // Парсим
+      // Объединяем 4 байта протокола в uint32_t для расчета CRC
+      word.byte[3] = StartByte;
+      word.byte[2] = prot.fst;
+      word.byte[1] = prot.snd;
+      word.byte[0] = prot.trd;
+      // Считаем аппаратно CRC
+      CRC_ResetDR();
+      CRC_CalcCRC(word.word);
+      crc = CRC_GetCRC();
+      if ((crc == prot.crc)&!(nErr==-1))
+      {
+        // Данные корректные, можно работать
+        Nbyte = nErr+Nbyte;
+        nErr = 0;
+        crc = 0;
+        TruePkg+=1;
 
-    buf[5] = 0xFF;
-    buf[6] = 0xAA;
-    buf[7] = 0xFF;
+        if (j > i)
+        {
+          buf[ sizeof(buf)- j + i] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
+        }
+        else
+        {
+          buf[i - j] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
+        }
+      }
+      else
+      {
+        prot.fst = 0x00;
+        prot.snd = 0x00;
+        prot.trd = 0x00;
+        NerrPkg+=1;
+      }
 
-    int8_t nErr = c_decode(buf); // Теперь buf длиной 255 содержит 235 байт исходной информации
-    nErr++;
-    /* 
-    uint32_t crc;
-    WordToByte word;
-
-    if (FlagStartByte(&buf[i]))
-    {
-      i++;
-      pars(&prot, &buf[i]);
-    }
-
-    // Объединяем 4 байта протокола в uint32_t для расчета CRC
-    word.byte[3] = StartByte;
-    word.byte[2] = prot.fst;
-    word.byte[1] = prot.snd;
-    word.byte[0] = prot.trd;
-    // Считаем аппаратно CRC
-    CRC_ResetDR();
-    CRC_CalcCRC(word.word);
-    crc = CRC_GetCRC();
-    crc++;
+    } // if FLAG
 
     if (prot.fst == 0x77)
     {
@@ -193,7 +230,6 @@ int main(void)
     {
       i = 0;
     }
-    */
   } // END_WHILE
 } // END_MAIN
 

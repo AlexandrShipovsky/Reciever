@@ -408,16 +408,15 @@ int c_form(int NErr, int bufsize)
 }
 // -F------------------------------------------------------------
 // Assume that the original information is in bytes, 0..(bufs-t2-1). Move it to t2 bytes to the right.
-void c_code(char *buf)
+void c_code(uint8_t *buf)
 {
-	int i;
 	c_buf = (BYTE *)buf;
 	memmove(c_buf + t2, c_buf, bufs - t2);
 	c_code0();
 }
 // -F------------------------------------------------------------
 //  The output must be bytes 0..(254-t2). So move it on t2 bytes to the left.
-int c_decode(char *buf)
+int c_decode(uint8_t *buf)
 {
 	int i, nerr;
 	c_buf = (BYTE *)buf;

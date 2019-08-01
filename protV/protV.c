@@ -21,15 +21,35 @@
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
-/**
-  * @brief  Парсер строки байт str в элементы протокола
-  * @param  None
-  * @retval None
+/** 
+  *   Флаг стартового байта (StartByte)
   */
-void pars(protVstructure *prot, uint8_t *str)
+_Bool FlagStartByte(uint8_t *str)
 {
+  if (*str == StartByte)
+  {
+    return 1;
+  }
+  return 0;
+}
+
+/** 
+  * Парсер пакета ( с кодировкой Рида-Соломона исправляющий 2 ошибки(можно изменить))
+  * Возвращает количество исправленных ошибок
+  * Возвращает -1 Если не удалось исправить все ошибки
+  */
+int pars(protVstructure *prot, uint8_t *str)
+{
+  int nErr; // Количество найденных ошибок
   WordToByte word;
-  prot->fst = *str;
+  str++;                             // Пропускаем стартовый байт
+  c_form(NumbOfErr, ProtLength - 1); // Будем исправлять 2 ошибки, в буфере длиной ProtLength - 1 байт (за вычетом стартового)
+  nErr = c_decode(str);              // Теперь str длиной 11 содержит 8 байт исходной информации
+  if(nErr == -1)                     // Если не удалось исправить вернуть -1
+  {
+    return nErr;
+  }
+  prot->fst = *str;                  // Парсинг строки
   str++;
   prot->snd = *str;
   str++;
@@ -43,16 +63,5 @@ void pars(protVstructure *prot, uint8_t *str)
   str++;
   word.byte[0] = *str;
   prot->crc = word.word;
-}
-
-/** 
-  *   Флаг стартового байта (StartByte)
-  */
-_Bool FlagStartByte(uint8_t *str)
-{
-  if (*str == StartByte)
-  {
-    return 1;
-  }
-  return 0;
+  return nErr;
 }
