@@ -29,7 +29,7 @@ _Bool FlagStartByte(uint8_t *str)
   if (*str == StartByte)
   {
     return 1;
-  }
+  }else
   return 0;
 }
 

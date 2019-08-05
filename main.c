@@ -36,13 +36,12 @@
 #define LEDpin GPIO_Pin_13
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t buf[15];      // Кольцевой буфер
+uint8_t buf[32];      // Кольцевой буфер
 protVstructure prot;  // Структура протокола
 int NerrPkg = 0; // Количество битых пакетов
 int TruePkg = 0; // Количество принятых правильных пакетов
 int Nbyte = 0;   // Количество исправленных байт
 
-uint8_t bufON[12];
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
 void DMA_ini(void);
@@ -99,7 +98,7 @@ void DMA_ini(void)
   DMA_DeInit(DMA1_Channel5); // Сброс настроек DMA
   DMA_InitTypeDef DMA_InitStruct;
   DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);   // Адрес данных UART
-  DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)&buf[0];               // Адрес буфера памяти
+  DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)buf;               // Адрес буфера памяти
   DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralSRC;                      // Направление передачи от переферии в память
   DMA_InitStruct.DMA_BufferSize = sizeof(buf);                         // Размер буфера
   DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;        // Отключить инкремент адреса данных переферии
@@ -139,15 +138,15 @@ int main(void)
   if (RCCStatus) // Проверка настроек тактирования
   {
     //Send_UART_Str(USART1, "I'm ready!\n\rRCC SUCCESS\n\r");
-    printf("I'm ready!\n\rRCC SUCCESS\n\r");
+    //printf("I'm ready!\n\rRCC SUCCESS\n\r");
   }
   else
   {
     //Send_UART_Str(USART1, "I'm ready!\n\rRCC ERROR\n\r");
-    printf("I'm ready!\n\rRCC ERROR\n\r");
+    //printf("I'm ready!\n\rRCC ERROR\n\r");
   }
 
-  int i, j = 0;
+  int i = 0, j = 0;
   uint32_t crc;    // Переменная для хранения CRC
   WordToByte word; // Объединение для расчета CRC
   int nErr;        // Количество исправленных ошибок
@@ -155,20 +154,9 @@ int main(void)
   while (1)
   {
     
-  /*  bufON[0] = 0xAA;
-    bufON[1] = 0x63;
-    bufON[2] = 0x73;
-    bufON[3] = 0x63;
-    bufON[4] = 0x23;
-    bufON[5] = 0x15;
-    bufON[6] = 0x2C;
-    bufON[7] = 0x09;
-    c_form(NumbOfErr, ProtLength-1); // Будем исправлять 2 ошибки, в буфере длиной ProtLength - 1 байт (за вычетом стартового)
-    c_code(&bufON[1]);     // Тепрь buf длиной 12 содержит 4 кодовых байт+8 информационных
-*/
-    if (FlagStartByte(&buf[i])) // Если в колцевом буфере есть стартовый байт
+    if (FlagStartByte(&buf[i])) // Если i-й байт - стартовый байт
     {
-      Delay_ms(500000);
+       Delay_ms(250000);
       for (j = 0; j < ProtLength; j++) // Копируем часть строки кольцевого буфера
       {
         pkg[j] = buf[i];
