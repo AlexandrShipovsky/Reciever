@@ -29,7 +29,7 @@ _Bool FlagStartByte(uint8_t *str)
   if (*str == StartByte)
   {
     return 1;
-  }else
+  }
   return 0;
 }
 
@@ -45,11 +45,11 @@ int pars(protVstructure *prot, uint8_t *str)
   str++;                             // Пропускаем стартовый байт
   c_form(NumbOfErr, ProtLength - 1); // Будем исправлять 2 ошибки, в буфере длиной ProtLength - 1 байт (за вычетом стартового)
   nErr = c_decode(str);              // Теперь str длиной 11 содержит 8 байт исходной информации
-  if(nErr == -1)                     // Если не удалось исправить вернуть -1
+  if (nErr == -1)                    // Если не удалось исправить вернуть -1
   {
     return nErr;
   }
-  prot->fst = *str;                  // Парсинг строки
+  prot->fst = *str; // Парсинг строки
   str++;
   prot->snd = *str;
   str++;
@@ -64,4 +64,32 @@ int pars(protVstructure *prot, uint8_t *str)
   word.byte[0] = *str;
   prot->crc = word.word;
   return nErr;
+}
+/** 
+  * Объединяет значения структуры протокола в строку
+  * Кодирует информационное сообщение
+  */
+void UnitBuf(protVstructure *prot, uint8_t *buf)
+{
+  uint8_t i = 0;
+  WordToByte crc;
+  crc.word = prot->crc;
+  buf[i] = StartByte;
+  i++;
+  buf[i] = prot->fst;
+  i++;
+  buf[i] = prot->snd;
+  i++;
+  buf[i] = prot->trd;
+  i++;
+  buf[i] = crc.byte[3];
+  i++;
+  buf[i] = crc.byte[2];
+  i++;
+  buf[i] = crc.byte[1];
+  i++;
+  buf[i] = crc.byte[0];
+  // Кодируем информацию без стартового байта
+  c_form(NumbOfErr, ProtLength - 1); // Будем исправлять 2 ошибки, в буфере длиной ProtLength - 1 байт (за вычетом стартового)
+  c_code(&buf[1]);                   // Тепрь buf длиной 12 содержит 1 стартовый байт 4 кодовых байта 3 информационных и 4 байта CRC32
 }

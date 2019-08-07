@@ -24,6 +24,10 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+// Состояния реле
+#define RelayON_1 ((uint8_t)(0xFF << 6)) // 0x11000000
+#define RelayON_2 ((uint8_t)(0xFF >> 6)) // 0x00000011
+#define RelayOFF ((uint8_t)(0x18)) // 0x00011000
 // Каналы реле
 #define RelayPORT GPIOA
 #define Relay_1 GPIO_Pin_0
@@ -34,9 +38,11 @@
 #define Relay_6 GPIO_Pin_5
 // Пин LED
 #define LEDpin GPIO_Pin_13
+// Размер буфера
+#define sizebuf 32
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t buf[32];      // Кольцевой буфер
+uint8_t buf[sizebuf];      // Кольцевой буфер
 protVstructure prot;  // Структура протокола
 int NerrPkg = 0; // Количество битых пакетов
 int TruePkg = 0; // Количество принятых правильных пакетов
@@ -45,6 +51,7 @@ int Nbyte = 0;   // Количество исправленных байт
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
 void DMA_ini(void);
+void SwitchRelay(void);
 ErrorStatus RCC_ini(void);
 /* Private functions ---------------------------------------------------------*/
 // Программная задержка
@@ -112,6 +119,64 @@ void DMA_ini(void)
 
   DMA_Cmd(DMA1_Channel5, ENABLE); // Включить DMA канал 5
 }
+// Управление реле
+void SwitchRelay(void)
+{
+  // Реле 11
+    if (prot.fst >> 6)
+    {
+      GPIO_ResetBits(GPIOC, LEDpin);
+    }
+    else
+    {
+      GPIO_SetBits(GPIOC, LEDpin);
+    }
+    // Реле 12
+    if (prot.fst << 6)
+    {
+      
+    }
+    else
+    {
+      
+    }
+    // Реле 21
+    if (prot.snd >> 6)
+    {
+      
+    }
+    else
+    {
+      
+    }
+    // Реле 22
+    if (prot.snd << 6)
+    {
+      
+    }
+    else
+    {
+      
+    }
+    // Реле 31
+    if (prot.trd >> 6)
+    {
+      
+    }
+    else
+    {
+      
+    }
+    // Реле 32
+    if (prot.trd << 6)
+    {
+      
+    }
+    else
+    {
+      
+    }
+}
 /**
   * @brief  Main program
   * @param  None
@@ -156,12 +221,12 @@ int main(void)
     
     if (FlagStartByte(&buf[i])) // Если i-й байт - стартовый байт
     {
-       Delay_ms(250000);
+      Delay_ms(360000); //  Ждем пока придет остальная часть пакета
       for (j = 0; j < ProtLength; j++) // Копируем часть строки кольцевого буфера
       {
         pkg[j] = buf[i];
         i++;
-        if (i >= sizeof(buf))
+        if (i >= (uint8_t)sizebuf)
         {
           i = 0; // Обнуляем инкремент кольцевого буфера
         }
@@ -181,11 +246,14 @@ int main(void)
       if ((crc == prot.crc)&!(nErr==-1))
       {
         // Данные корректные, можно работать
+        
+        SwitchRelay();
+        
         Nbyte = nErr+Nbyte;
         nErr = 0;
         crc = 0;
         TruePkg+=1;
-
+        // Включаем/отключаем реле
         if (j > i)
         {
           buf[ sizeof(buf)- j + i] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
@@ -197,24 +265,15 @@ int main(void)
       }
       else
       {
-        prot.fst = 0x00;
-        prot.snd = 0x00;
-        prot.trd = 0x00;
         NerrPkg+=1;
       }
 
     } // if FLAG
-
-    if (prot.fst == 0x77)
-    {
-      GPIO_SetBits(GPIOC, LEDpin);
-    }
-    else if (prot.snd == 0x73)
-    {
-      GPIO_ResetBits(GPIOC, LEDpin);
-    }
+    
+    
+    
     i++;
-    if (i == sizeof(buf))
+    if (i == sizebuf)
     {
       i = 0;
     }
