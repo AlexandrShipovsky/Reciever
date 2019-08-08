@@ -27,32 +27,33 @@
 // Состояния реле
 #define RelayON_1 ((uint8_t)(0xFF << 6)) // 0x11000000
 #define RelayON_2 ((uint8_t)(0xFF >> 6)) // 0x00000011
-#define RelayOFF ((uint8_t)(0x18)) // 0x00011000
+#define RelayOFF ((uint8_t)(0x18))       // 0x00011000
 // Каналы реле
 #define RelayPORT GPIOA
-#define Relay_1 GPIO_Pin_0
-#define Relay_2 GPIO_Pin_1
-#define Relay_3 GPIO_Pin_2
-#define Relay_4 GPIO_Pin_3
-#define Relay_5 GPIO_Pin_4
-#define Relay_6 GPIO_Pin_5
+#define Relay_11 GPIO_Pin_0
+#define Relay_12 GPIO_Pin_1
+#define Relay_21 GPIO_Pin_2
+#define Relay_22 GPIO_Pin_3
+#define Relay_31 GPIO_Pin_4
+#define Relay_32 GPIO_Pin_5
 // Пин LED
 #define LEDpin GPIO_Pin_13
 // Размер буфера
 #define sizebuf 32
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t buf[sizebuf];      // Кольцевой буфер
+uint8_t buf[sizebuf]; // Кольцевой буфер
 protVstructure prot;  // Структура протокола
-int NerrPkg = 0; // Количество битых пакетов
-int TruePkg = 0; // Количество принятых правильных пакетов
-int Nbyte = 0;   // Количество исправленных байт
+int NerrPkg = 0;      // Количество битых пакетов
+int TruePkg = 0;      // Количество принятых правильных пакетов
+int Nbyte = 0;        // Количество исправленных байт
 
 /* Private function prototypes -----------------------------------------------*/
 void Delay_ms(uint32_t ms);
 void DMA_ini(void);
 void SwitchRelay(void);
 ErrorStatus RCC_ini(void);
+void GPIO_ini(void);
 /* Private functions ---------------------------------------------------------*/
 // Программная задержка
 void Delay_ms(uint32_t ms)
@@ -105,7 +106,7 @@ void DMA_ini(void)
   DMA_DeInit(DMA1_Channel5); // Сброс настроек DMA
   DMA_InitTypeDef DMA_InitStruct;
   DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);   // Адрес данных UART
-  DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)buf;               // Адрес буфера памяти
+  DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)buf;                   // Адрес буфера памяти
   DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralSRC;                      // Направление передачи от переферии в память
   DMA_InitStruct.DMA_BufferSize = sizeof(buf);                         // Размер буфера
   DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;        // Отключить инкремент адреса данных переферии
@@ -123,59 +124,79 @@ void DMA_ini(void)
 void SwitchRelay(void)
 {
   // Реле 11
-    if (prot.fst >> 6)
-    {
-      GPIO_ResetBits(GPIOC, LEDpin);
-    }
-    else
-    {
-      GPIO_SetBits(GPIOC, LEDpin);
-    }
-    // Реле 12
-    if (prot.fst << 6)
-    {
-      
-    }
-    else
-    {
-      
-    }
-    // Реле 21
-    if (prot.snd >> 6)
-    {
-      
-    }
-    else
-    {
-      
-    }
-    // Реле 22
-    if (prot.snd << 6)
-    {
-      
-    }
-    else
-    {
-      
-    }
-    // Реле 31
-    if (prot.trd >> 6)
-    {
-      
-    }
-    else
-    {
-      
-    }
-    // Реле 32
-    if (prot.trd << 6)
-    {
-      
-    }
-    else
-    {
-      
-    }
+  if (prot.fst >> 6)
+  {
+    GPIO_ResetBits(GPIOC, LEDpin);
+    GPIO_SetBits(RelayPORT, Relay_11);
+  }
+  else
+  {
+    GPIO_ResetBits(RelayPORT, Relay_11);
+  }
+  // Реле 12
+  if (prot.fst << 6)
+  {
+    GPIO_SetBits(GPIOC, LEDpin);
+    GPIO_SetBits(RelayPORT, Relay_12);
+  }
+  else
+  {
+    GPIO_ResetBits(RelayPORT, Relay_12);
+  }
+  // Реле 21
+  if (prot.snd >> 6)
+  {
+    GPIO_SetBits(RelayPORT, Relay_21);
+  }
+  else
+  {
+    GPIO_ResetBits(RelayPORT, Relay_21);
+  }
+  // Реле 22
+  if (prot.snd << 6)
+  {
+    GPIO_SetBits(RelayPORT, Relay_22);
+  }
+  else
+  {
+    GPIO_ResetBits(RelayPORT, Relay_22);
+  }
+  // Реле 31
+  if (prot.trd >> 6)
+  {
+    GPIO_SetBits(RelayPORT, Relay_31);
+  }
+  else
+  {
+    GPIO_ResetBits(RelayPORT, Relay_31);
+  }
+  // Реле 32
+  if (prot.trd << 6)
+  {
+    GPIO_SetBits(RelayPORT, Relay_32);
+  }
+  else
+  {
+    GPIO_ResetBits(RelayPORT, Relay_32);
+  }
+}
+// Настройка GPIO
+void GPIO_ini(void)
+{
+  // Настройка LED
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+  GPIO_InitTypeDef PIN_INIT;
+  PIN_INIT.GPIO_Pin = LEDpin;
+  PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
+  PIN_INIT.GPIO_Mode = GPIO_Mode_Out_OD;
+  GPIO_Init(GPIOC, &PIN_INIT);
+
+  // Настройка пинов реле
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+  PIN_INIT.GPIO_Pin = Relay_11 | Relay_12 | Relay_21 | Relay_22 | Relay_31 | Relay_32;
+  PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
+  PIN_INIT.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_Init(RelayPORT, &PIN_INIT);
 }
 /**
   * @brief  Main program
@@ -188,18 +209,12 @@ int main(void)
   RCCStatus = RCC_ini();
   UART_Init();
   DMA_ini();
+  GPIO_ini();
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 
   /*!< At this stage the microcontroller setting
      */
 
-  // Настройка LED
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-  GPIO_InitTypeDef PIN_INIT;
-  PIN_INIT.GPIO_Pin = LEDpin;
-  PIN_INIT.GPIO_Speed = GPIO_Speed_10MHz;
-  PIN_INIT.GPIO_Mode = GPIO_Mode_Out_OD;
-  GPIO_Init(GPIOC, &PIN_INIT);
   if (RCCStatus) // Проверка настроек тактирования
   {
     //Send_UART_Str(USART1, "I'm ready!\n\rRCC SUCCESS\n\r");
@@ -218,11 +233,11 @@ int main(void)
   uint8_t pkg[12]; // Пакет для обработки
   while (1)
   {
-    
+
     if (FlagStartByte(&buf[i])) // Если i-й байт - стартовый байт
     {
-      Delay_ms(360000); //  Ждем пока придет остальная часть пакета
-      for (j = 0; j < ProtLength; j++) // Копируем часть строки кольцевого буфера
+      Delay_ms(360000);                //  Ждем пока придет остальная часть пакета
+      for (j = 0; j < ProtLength; j++) // Копируем пакет из кольцевого буфера
       {
         pkg[j] = buf[i];
         i++;
@@ -243,20 +258,21 @@ int main(void)
       CRC_ResetDR();
       CRC_CalcCRC(word.word);
       crc = CRC_GetCRC();
-      if ((crc == prot.crc)&!(nErr==-1))
+      if ((crc == prot.crc) & !(nErr == -1))
       {
         // Данные корректные, можно работать
-        
+
+        // Включаем/отключаем реле
         SwitchRelay();
-        
-        Nbyte = nErr+Nbyte;
+
+        Nbyte = nErr + Nbyte; // Число исправленных байт
         nErr = 0;
         crc = 0;
-        TruePkg+=1;
-        // Включаем/отключаем реле
+        TruePkg += 1; // Число исправленных пакетов
+
         if (j > i)
         {
-          buf[ sizeof(buf)- j + i] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
+          buf[sizeof(buf) - j + i] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
         }
         else
         {
@@ -265,13 +281,11 @@ int main(void)
       }
       else
       {
-        NerrPkg+=1;
+        NerrPkg += 1;
       }
 
     } // if FLAG
-    
-    
-    
+
     i++;
     if (i == sizebuf)
     {
