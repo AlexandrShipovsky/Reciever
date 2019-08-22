@@ -39,7 +39,7 @@
 // Пин LED
 #define LEDpin GPIO_Pin_13
 // Размер буфера
-#define sizebuf 32
+#define sizebuf 33
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t buf[sizebuf]; // Кольцевой буфер
@@ -123,37 +123,44 @@ void DMA_ini(void)
 // Управление реле
 void SwitchRelay(void)
 {
+  uint8_t FT;
   // Реле 11
-  if (prot.fst >> 6)
-  {
-    GPIO_ResetBits(GPIOC, LEDpin);
+  FT = (prot.fst >> 6);
+  if (FT)
+  { 
+    GPIO_ResetBits(GPIOC, LEDpin); ////////////////
     GPIO_SetBits(RelayPORT, Relay_11);
   }
   else
   {
     GPIO_ResetBits(RelayPORT, Relay_11);
-  }
+    GPIO_SetBits(GPIOC, LEDpin); ///////////////
+  };
   // Реле 12
-  if (prot.fst << 6)
-  {
-    GPIO_SetBits(GPIOC, LEDpin);
+  FT = (prot.fst << 6);
+  if (FT)
+  {   
     GPIO_SetBits(RelayPORT, Relay_12);
+        
   }
   else
   {
     GPIO_ResetBits(RelayPORT, Relay_12);
   }
   // Реле 21
-  if (prot.snd >> 6)
+  FT = (prot.snd >> 6);
+  if (FT)
   {
     GPIO_SetBits(RelayPORT, Relay_21);
+    
   }
   else
   {
     GPIO_ResetBits(RelayPORT, Relay_21);
   }
   // Реле 22
-  if (prot.snd << 6)
+  FT = (prot.snd << 6);
+  if (FT)
   {
     GPIO_SetBits(RelayPORT, Relay_22);
   }
@@ -162,7 +169,8 @@ void SwitchRelay(void)
     GPIO_ResetBits(RelayPORT, Relay_22);
   }
   // Реле 31
-  if (prot.trd >> 6)
+  FT = (prot.trd >> 6);
+  if (FT)
   {
     GPIO_SetBits(RelayPORT, Relay_31);
   }
@@ -171,7 +179,8 @@ void SwitchRelay(void)
     GPIO_ResetBits(RelayPORT, Relay_31);
   }
   // Реле 32
-  if (prot.trd << 6)
+  FT = (prot.trd << 6);
+  if (FT)
   {
     GPIO_SetBits(RelayPORT, Relay_32);
   }
@@ -236,7 +245,7 @@ int main(void)
 
     if (FlagStartByte(&buf[i])) // Если i-й байт - стартовый байт
     {
-      Delay_ms(360000);                //  Ждем пока придет остальная часть пакета
+      Delay_ms(180000);                //  Ждем пока придет остальная часть пакета
       for (j = 0; j < ProtLength; j++) // Копируем пакет из кольцевого буфера
       {
         pkg[j] = buf[i];
@@ -247,7 +256,7 @@ int main(void)
         }
       }
       j--;
-      i--;
+      i--;                
       nErr = pars(&prot, pkg); // Парсим
       // Объединяем 4 байта протокола в uint32_t для расчета CRC
       word.byte[3] = StartByte;
@@ -265,14 +274,14 @@ int main(void)
         // Включаем/отключаем реле
         SwitchRelay();
 
-        Nbyte = nErr + Nbyte; // Число исправленных байт
-        nErr = 0;
+        //Nbyte = nErr + Nbyte; // Число исправленных байт
+        //nErr = 0;
         crc = 0;
-        TruePkg += 1; // Число исправленных пакетов
+        //TruePkg += 1; // Число исправленных пакетов
 
         if (j > i)
         {
-          buf[sizeof(buf) - j + i] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
+          buf[sizebuf - j + i] = 0x00; // Стираем стартовый байт (остальное сотрет DMA)
         }
         else
         {
@@ -281,7 +290,7 @@ int main(void)
       }
       else
       {
-        NerrPkg += 1;
+        //NerrPkg += 1;
       }
 
     } // if FLAG
